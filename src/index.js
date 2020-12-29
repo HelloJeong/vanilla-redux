@@ -1,40 +1,68 @@
 import { createStore } from "redux";
 
-const add = document.getElementById("add");
-const minus = document.getElementById("minus");
-const number = document.querySelector("span");
+const in_todo = document.getElementById("in_todo");
+const btn_add = document.getElementById("btn_add");
+const ul = document.getElementById("todo_list");
 
-number.innerText = 0;
+const ADD_TODO = "ADD_TODO";
+const DELETE_TODO = "DELETE_TODO";
 
-const ADD = "ADD";
-const MINUS = "MINUS";
+const addToDo = (text) => ({
+  type: ADD_TODO,
+  text,
+});
 
-const reducer = (count = 0, action) => {
+const deleteToDo = (id) => ({
+  type: DELETE_TODO,
+  id,
+});
+
+const reducer = (todos = [], action) => {
+  console.log(todos, action);
   switch (action.type) {
-    case ADD:
-      return count + 1;
-    case MINUS:
-      return count - 1;
+    case ADD_TODO:
+      return [...todos, { text: action.text, id: Date.now() }];
+    case DELETE_TODO:
+      return todos.filter((todo) => todo.id !== action.id);
     default:
-      return count;
+      return todos;
   }
 };
 
 const store = createStore(reducer);
 
+const dispatchDeleteToDo = (id) => {
+  store.dispatch(deleteToDo(id));
+};
+
+const onDeleteTodo = (e) => {
+  const id = parseInt(e.target.parentNode.id);
+  dispatchDeleteToDo(id);
+};
+
 const onChange = () => {
-  number.innerText = store.getState();
+  const todos = store.getState();
+  ul.innerHTML = "";
+  todos.forEach((v) => {
+    const li = document.createElement("li");
+    const button = document.createElement("button");
+    button.innerText = "DEL";
+    button.type = "button";
+    button.addEventListener("click", onDeleteTodo);
+    li.id = v.id;
+    li.innerText = v.text;
+    li.appendChild(button);
+    ul.append(li);
+  });
 };
 
 store.subscribe(onChange);
 
-add.addEventListener("click", () => store.dispatch({ type: ADD }));
-minus.addEventListener("click", () => store.dispatch({ type: MINUS }));
+const dispatchAddToDo = (text) => {
+  store.dispatch(addToDo(text));
+};
 
-// console.log(store);
-// console.log(store.getState());
-
-// store.dispatch({ type: "ADD" });
-// console.log(store.getState());
-// store.dispatch({ type: "MINUS" });
-// console.log(store.getState());
+btn_add.addEventListener("click", () => {
+  dispatchAddToDo(in_todo.value);
+  in_todo.value = "";
+});

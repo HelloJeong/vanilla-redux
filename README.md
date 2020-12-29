@@ -14,3 +14,5 @@
   - `action`만이 state를 modify 할 수 있음
 - `dispatch` : `{type:~ }`을 지정해서 호출하면 reducer가 호출됨
 - `subscribe` : store 안의 변화들을 알 수 있게 해줌
+- `mutation(원본의 변형)`은 절대로 하지 말 것
+  - spread를 이용해 새로운 객체를 리턴
